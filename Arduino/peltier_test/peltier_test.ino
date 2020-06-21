@@ -8,18 +8,18 @@ void setup() {
 }
 
 void loop() {
- digitalWrite(Peltier_in1, HIGH); //正
+ //digitalWrite(Peltier_in1, HIGH); //正
  int duty = (int)(0.25 * 255);
- analogWrite(PWM_output, duty); //PWM設定値:0～255　255=6V(外部電源)
- delay(10000);
+ //analogWrite(PWM_output, duty); //PWM設定値:0～255　255=6V(外部電源)
+ //delay(10000);
  digitalWrite(Peltier_in1,LOW); //無負荷
- analogWrite(PWM_output, 0);
- delay(1000);
+ //analogWrite(PWM_output, 0);
+ //delay(1000);
 
  digitalWrite(Peltier_in2, HIGH); //負
  analogWrite(PWM_output, duty);
- delay(10000);
+ delay(50000);
  digitalWrite(Peltier_in2,LOW); //無負荷
- analogWrite(PWM_output,0);
- delay(1000);
+ //analogWrite(PWM_output,0);
+ //delay(1000);
 }

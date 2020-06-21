@@ -3,7 +3,7 @@ const int sensorPin_2 = A1;
 float sensorValue_1;
 float voltageOut_1;
 float sensorValue_2;
-float voltageOut_2;
+float voltageOut_2
 
 float temperatureC_1;
 float temperatureF_1;

@@ -1,4 +1,4 @@
-//温度を上げたい時
+//シリアル通信でPythonの入力から目標値を取得
 #include <PID_v1.h>
 
 //Define Variables we'll be connecting to
@@ -24,11 +24,15 @@ float voltageOut_2;
 float temperatureC_1;
 float temperatureC_2;
 
-//double PE; //初期誤差
+double PE; //初期誤差
 
 const int Peltier_in1 = 0;  //Arduino デジタル信号入力
 const int Peltier_in2 = 1;  //Arduino デジタル信号入力
 const int PWM_output = 3;  //PWM制御 (アナログ入力)
+
+//Pythonからの入力(目標値)読み込み
+int inputchar;
+int mode;
 
 void setup()
 {
@@ -43,7 +47,7 @@ void setup()
   // calculate temperature for LM335
   temperatureC_1 = voltageOut_1 / 10 - 273;
   temperatureC_2 = voltageOut_2 / 10 - 273;
-  //PE = (double)(temperatureC_2 - temperatureC_1); //1が室温、2が制御側
+  PE = (double)(temperatureC_2 - temperatureC_1); //1が室温、2が制御側
 
   Serial.print("Initialized  Temperature_1(ºC): ");
   Serial.print(temperatureC_1);
@@ -56,11 +60,10 @@ void setup()
 
   //PID制御の初期化
   //initialize the variables we're linked to
-  Input = -1 * ((double)(temperatureC_2 - temperatureC_1));
-  Setpoint = 2;
+  Input = (double)(temperatureC_2 - temperatureC_1) - PE;
+  Setpoint = 0;
 
-  //turn the PID on
-  myPID.SetMode(AUTOMATIC);
+  mode = 0;
 }
 
 void loop()
@@ -72,13 +75,34 @@ void loop()
   // calculate temperature for LM335
   temperatureC_1 = voltageOut_1 / 10 - 273;
   temperatureC_2 = voltageOut_2 / 10 - 273;
-  
-  Input = -1 * ((double)(temperatureC_2 - temperatureC_1));
+
+  inputchar = Serial.read(); //シリアル通信で送信された値を読み取る
+  //入力があった時
+  if(inputchar!=-1){
+    switch(inputchar){
+      case 'h':
+        Input = (double)(temperatureC_2 - temperatureC_1) - PE;
+        Setpoint = 2;
+        digitalWrite(Peltier_in1, LOW);
+        digitalWrite(Peltier_in2, HIGH);
+        mode = 1;
+        break;
+
+      case 'c':
+        Input = -1 * ((double)(temperatureC_2 - temperatureC_1) - PE);
+        Setpoint = -1 * -2;
+        digitalWrite(Peltier_in1, HIGH); //負
+        digitalWrite(Peltier_in2, LOW);
+        mode = 2;
+        break;
+    }
+    //turn the PID on
+    myPID.SetMode(AUTOMATIC);
+  }
+  else{
+  }
 
   double gap = abs(Setpoint - Input); //distance away from setpoint
-
-  digitalWrite(Peltier_in1, HIGH); //正
-  digitalWrite(Peltier_in2, LOW);
   
   if (gap < 0.3) {
     //we're close to setpoint, use conservative tuning parameters
@@ -97,6 +121,8 @@ void loop()
   Serial.print(temperatureC_1);
   Serial.print("  Temperature_2(ºC): ");
   Serial.print(temperatureC_2);
+  Serial.print("  Mode : ");
+  Serial.print(mode);
   Serial.print("  Current Gap : ");
   Serial.print(Setpoint - Input);
   Serial.print("  Output(V) : ");
