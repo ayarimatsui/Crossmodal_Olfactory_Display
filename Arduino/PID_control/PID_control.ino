@@ -6,7 +6,7 @@
 double Setpoint, Input, Output; //PID制御の目標値、入力、出力
 
 //Define the aggressive and conservative Tuning Parameters
-double aggKp=150, aggKi=10, aggKd=1;
+double aggKp=100, aggKi=1, aggKd=1;
 double consKp=50, consKi=0.1, consKd=0.8;
 
 //Specify the links and initial tuning parameters
@@ -14,8 +14,8 @@ PID myPID(&Input, &Output, &Setpoint, consKp, consKi, consKd, DIRECT);
 
 
 //IC温度センサ、ペルチェ制御関連の変数とか
-const int sensorPin_1 = A0;
-const int sensorPin_2 = A1; 
+int sensorPin_1 = A0;
+int sensorPin_2 = A1; 
 float sensorValue_1;
 float voltageOut_1;
 float sensorValue_2;
@@ -26,9 +26,9 @@ float temperatureC_2;
 
 //double PE; //初期誤差
 
-const int Peltier_in1 = 0;  //Arduino デジタル信号入力
-const int Peltier_in2 = 1;  //Arduino デジタル信号入力
-const int PWM_output = 3;  //PWM制御 (アナログ入力)
+int Peltier_in1 = 2;  //Arduino デジタル信号入力
+int Peltier_in2 = 4;  //Arduino デジタル信号入力
+int PWM_output = 3;  //PWM制御 (アナログ入力)
 
 void setup()
 {
@@ -56,7 +56,7 @@ void setup()
 
   //PID制御の初期化
   //initialize the variables we're linked to
-  Input = -1 * ((double)(temperatureC_2 - temperatureC_1));
+  Input = (double)(temperatureC_2 - temperatureC_1);
   Setpoint = 2;
 
   //turn the PID on
@@ -73,12 +73,12 @@ void loop()
   temperatureC_1 = voltageOut_1 / 10 - 273;
   temperatureC_2 = voltageOut_2 / 10 - 273;
   
-  Input = -1 * ((double)(temperatureC_2 - temperatureC_1));
+  Input = (double)(temperatureC_2 - temperatureC_1);
 
   double gap = abs(Setpoint - Input); //distance away from setpoint
 
-  digitalWrite(Peltier_in1, HIGH); //正
-  digitalWrite(Peltier_in2, LOW);
+  //digitalWrite(Peltier_in1, HIGH); //正
+  //digitalWrite(Peltier_in2, LOW);
   
   if (gap < 0.3) {
     //we're close to setpoint, use conservative tuning parameters
@@ -91,6 +91,8 @@ void loop()
   }
 
   myPID.Compute();
+  digitalWrite(Peltier_in1, LOW);
+  digitalWrite(Peltier_in2, HIGH);
   analogWrite(PWM_output, Output);
   
   Serial.print("Temperature_1(ºC): ");
