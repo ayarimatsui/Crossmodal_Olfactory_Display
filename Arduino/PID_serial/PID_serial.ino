@@ -60,6 +60,7 @@ void setup()
   pinMode(Peltier_in1, OUTPUT);
   pinMode(Peltier_in2, OUTPUT);
 
+  
   //PID制御の初期化
   //initialize the variables we're linked to
   //Input = (double)(temperatureC_2 - temperatureC_1);
@@ -114,7 +115,6 @@ void loop()
     }
   }
   else{
-
     if (mode == 1) {
       Input_h = (double)(temperatureC_2 - temperatureC_1);
       double gap = abs(Setpoint_h - Input_h); //distance away from setpoint
