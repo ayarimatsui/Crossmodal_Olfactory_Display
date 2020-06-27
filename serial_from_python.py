@@ -2,7 +2,7 @@ import serial   #モジュール名はpyserialだが, importする際はserial�
 
 def main():
     speed = 9600; #シリアル通信のデータ転送レート
-    port = '/dev/cu.usbmodem14101' #Arduinoを接続してるシリアルポート
+    port = '/dev/cu.usbmodem143101' #Arduinoを接続してるシリアルポート
     with serial.Serial(port,speed,timeout=1) as ser:
         while True:
             flag=bytes(input(),'utf-8')
