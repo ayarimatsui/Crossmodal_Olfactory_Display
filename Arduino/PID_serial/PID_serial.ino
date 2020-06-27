@@ -36,6 +36,10 @@ int PWM_output = 3;  //PWM制御 (アナログ入力)
 int inputchar;
 int mode;
 
+//PWM制御(スイッチング用)のピン
+const int fan_output = 11;
+
+
 void setup()
 {
   //温度センサからの入力を初期化
@@ -59,6 +63,10 @@ void setup()
   //ペルチェ制御の初期化
   pinMode(Peltier_in1, OUTPUT);
   pinMode(Peltier_in2, OUTPUT);
+
+  //ファンの設定
+  pinMode(fan_output, OUTPUT);
+  digitalWrite(fan_output, LOW);
 
   
   //PID制御の初期化
@@ -111,6 +119,8 @@ void loop()
         mode = 2;
         //turn the PID on
         myPID_c.SetMode(AUTOMATIC);
+        //ファンをon
+        digitalWrite(fan_output, HIGH);
         break;
     }
   }
@@ -143,6 +153,11 @@ void loop()
       Serial.print(Setpoint_h - Input_h);
       Serial.print("  Output(V) : ");
       Serial.println(6 * Output_h / 255);
+
+      //目標値に近づいてきたら、ファンの回転を止める
+      if (abs(Setpoint_h - Input_h) < 2) {
+        digitalWrite(fan_output, LOW);
+      }
     }
 
     else if (mode == 2) {
