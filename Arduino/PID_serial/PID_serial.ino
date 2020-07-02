@@ -5,6 +5,7 @@
 //PID制御関連の変数、初期設定
 double Setpoint_h, Input_h, Output_h; //PID制御の目標値、入力、出力
 double Setpoint_c, Input_c, Output_c; //PID制御の目標値、入力、出力
+double Input;
 
 //Define the aggressive and conservative Tuning Parameters
 double aggKp=150, aggKi=10, aggKd=1;
@@ -91,6 +92,41 @@ void loop()
   //入力があった時
   if(inputchar!=-1){
     switch(inputchar){
+      case 'r':
+       Input = (double)(temperatureC_2 - temperatureC_1);
+        if (Input >= 0) {
+          Input_c = -1 * (double)(temperatureC_2 - temperatureC_1);
+          Setpoint_c = 0;
+          myPID_h.SetMode(MANUAL);
+          digitalWrite(Peltier_in1, LOW);
+          digitalWrite(Peltier_in2, LOW);
+          analogWrite(PWM_output, 0);
+          delay(1000);
+          digitalWrite(Peltier_in1, HIGH); //負
+          digitalWrite(Peltier_in2, LOW);
+          mode = 2;
+          //turn the PID on
+          myPID_c.SetMode(AUTOMATIC);
+          //ファンをon
+          digitalWrite(fan_output, HIGH);
+          break;
+        }
+        else {
+          Input_h = (double)(temperatureC_2 - temperatureC_1);
+          Setpoint_h = 0;
+          myPID_c.SetMode(MANUAL);
+          digitalWrite(Peltier_in1, LOW);
+          digitalWrite(Peltier_in2, LOW);
+          analogWrite(PWM_output, 0);
+          delay(1000);
+          digitalWrite(Peltier_in1, LOW);
+          digitalWrite(Peltier_in2, HIGH);
+          mode = 1;
+          //turn the PID on
+          myPID_h.SetMode(AUTOMATIC);
+          break;
+        }
+        
       case 'h':
         Input_h = (double)(temperatureC_2 - temperatureC_1);
         Setpoint_h = 2;
