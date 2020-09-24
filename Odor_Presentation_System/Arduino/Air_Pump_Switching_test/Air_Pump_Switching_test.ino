@@ -8,9 +8,15 @@ const int pump_output4 = 9;
 int inputchar;
 
 void setup() {
-  pinMode(pump_output, OUTPUT);
+  pinMode(pump_output1, OUTPUT);
+  pinMode(pump_output2, OUTPUT);
+  pinMode(pump_output3, OUTPUT);
+  pinMode(pump_output4, OUTPUT);
   Serial.begin(9600);
-  digitalWrite(pump_output, LOW);
+  digitalWrite(pump_output1, LOW);
+  digitalWrite(pump_output2, LOW);
+  digitalWrite(pump_output3, LOW);
+  digitalWrite(pump_output4, LOW);
 }
 
 void loop() {
