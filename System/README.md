@@ -1,0 +1,2 @@
+システム全体をまとめたディレクトリ
+Nasal_Skin_Temperature_Control_System, Odor_Presentation_System は、それぞれの機能を別々にまとめたディレクトリ
