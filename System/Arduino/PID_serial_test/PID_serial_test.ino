@@ -1,43 +1,50 @@
 //シリアル通信でPythonの入力から目標値を取得
 #include <PID_v1.h>
 
-//Define Variables we'll be connecting to
-//PID制御関連の変数、初期設定
-double Setpoint_h, Input_h, Output_h; //PID制御の目標値、入力、出力
-double Setpoint_c, Input_c, Output_c; //PID制御の目標値、入力、出力
-double Input;
+namespace {
+  //Define Variables we'll be connecting to
+  //PID制御関連の変数、初期設定
+  double Setpoint_h, Input_h, Output_h; //PID制御の目標値、入力、出力
+  double Setpoint_c, Input_c, Output_c; //PID制御の目標値、入力、出力
+  double Input;
+  
+  //Define the aggressive and conservative Tuning Parameters
+  double aggKp=150, aggKi=10, aggKd=1;
+  double consKp=50, consKi=0.1, consKd=0.8;
+  
+  //Specify the links and initial tuning parameters
+  PID myPID_h(&Input_h, &Output_h, &Setpoint_h, consKp, consKi, consKd, DIRECT);
+  PID myPID_c(&Input_c, &Output_c, &Setpoint_c, consKp, consKi, consKd, DIRECT);
+  
+  
+  //IC温度センサ、ペルチェ制御関連の変数とか
+  const int sensorPin_1 = A0;
+  const int sensorPin_2 = A1; 
+  float sensorValue_1;
+  float voltageOut_1;
+  float sensorValue_2;
+  float voltageOut_2;
+  
+  float temperatureC_1;
+  float temperatureC_2;
+  
+  //double PE; //初期誤差
+  
+  int Peltier_in1 = 13;  //Arduino デジタル信号入力
+  int Peltier_in2 = 12;  //Arduino デジタル信号入力
+  int PWM_output = 11;  //PWM制御 (アナログ入力)
+  
+  //Pythonからの入力(目標値)読み込み
+  int inputchar;
+  int mode;
+}
 
-//Define the aggressive and conservative Tuning Parameters
-double aggKp=150, aggKi=10, aggKd=1;
-double consKp=50, consKi=0.1, consKd=0.8;
-
-//Specify the links and initial tuning parameters
-PID myPID_h(&Input_h, &Output_h, &Setpoint_h, consKp, consKi, consKd, DIRECT);
-PID myPID_c(&Input_c, &Output_c, &Setpoint_c, consKp, consKi, consKd, DIRECT);
-
-
-//IC温度センサ、ペルチェ制御関連の変数とか
-const int sensorPin_1 = A0;
-const int sensorPin_2 = A1; 
-float sensorValue_1;
-float voltageOut_1;
-float sensorValue_2;
-float voltageOut_2;
-
-float temperatureC_1;
-float temperatureC_2;
-
-//double PE; //初期誤差
-
-int Peltier_in1 = 13;  //Arduino デジタル信号入力
-int Peltier_in2 = 12;  //Arduino デジタル信号入力
-int PWM_output = 11;  //PWM制御 (アナログ入力)
-
-//Pythonからの入力(目標値)読み込み
-int inputchar;
-int mode;
-
-
+float calcTemp(sensorValue)
+{
+  voltageOut = (sensorValue * 5000) / 1024;
+  temperatureC = voltageOut / 10 - 273;
+  return temperatureC;
+}
 
 void setup()
 {
@@ -47,11 +54,8 @@ void setup()
   Serial.begin(9600);
   sensorValue_1 = analogRead(sensorPin_1);
   sensorValue_2 = analogRead(sensorPin_2);
-  voltageOut_1 = (sensorValue_1 * 5000) / 1024;
-  voltageOut_2 = (sensorValue_2 * 5000) / 1024;
-  // calculate temperature for LM335
-  temperatureC_1 = voltageOut_1 / 10 - 273;
-  temperatureC_2 = voltageOut_2 / 10 - 273;
+  temperatureC_1 = calcTemp(sensorValue_1);
+  temperatureC_2 = calcTemp(sensorValue_2);
   //PE = (double)(temperatureC_2 - temperatureC_1); //1が室温、2が制御側
 
   Serial.print("Initialized  Temperature_1(ºC): ");
@@ -76,11 +80,8 @@ void loop()
 {
   sensorValue_1 = analogRead(sensorPin_1);
   sensorValue_2 = analogRead(sensorPin_2);
-  voltageOut_1 = (sensorValue_1 * 5000) / 1024;
-  voltageOut_2 = (sensorValue_2 * 5000) / 1024;
-  // calculate temperature for LM335
-  temperatureC_1 = voltageOut_1 / 10 - 273;
-  temperatureC_2 = voltageOut_2 / 10 - 273;
+  temperatureC_1 = calcTemp(sensorValue_1);
+  temperatureC_2 = calcTemp(sensorValue_2);
 
   inputchar = Serial.read(); //シリアル通信で送信された値を読み取る
   //入力があった時
