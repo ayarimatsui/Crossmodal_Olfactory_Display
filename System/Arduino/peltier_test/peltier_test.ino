@@ -9,7 +9,7 @@ void setup() {
 
 void loop() {
  digitalWrite(Peltier_in1, HIGH); //正
- int duty = (int)(0.4 * 255);
+ int duty = (int)(0.7 * 255);
  analogWrite(PWM_output, duty); //PWM設定値:0～255　255=6V(外部電源)  今回はペルチェ素子には2.4Vかかるようにする
  delay(50000);
  digitalWrite(Peltier_in1,LOW); //無負荷
