@@ -55,6 +55,9 @@ const int pump_output4 = 9;
 int inputchar;
 int mode;
 
+//DCファンのPWM制御(スイッチング)のピン
+const int fan_output = 10;
+
 
 void setup() {
   //ペルチェ素子制御関連の初期設定
@@ -91,6 +94,10 @@ void setup() {
   digitalWrite(pump_output2, LOW);
   digitalWrite(pump_output3, LOW);
   digitalWrite(pump_output4, LOW);
+
+  //ファンの設定
+  pinMode(fan_output, OUTPUT);
+  digitalWrite(fan_output, LOW);
 
   //モードの初期化
   mode = 0;
@@ -174,6 +181,8 @@ void loop() {
           mode = 2;
           //turn the PID on
           myPID_c.SetMode(AUTOMATIC);
+          //ファンをon
+          digitalWrite(fan_output, HIGH);
           Serial.println("room temperature");
           break;
         }
@@ -223,6 +232,8 @@ void loop() {
         mode = 2;
         //turn the PID on
         myPID_c.SetMode(AUTOMATIC);
+        //ファンをon
+        digitalWrite(fan_output, HIGH);
         Serial.println("-2℃ from room temperature");
         break;
     }
@@ -257,6 +268,11 @@ void loop() {
       Serial.print(Setpoint_h - Input_h);
       Serial.print("  Output(V) : ");
       Serial.println(6 * Output_h / 255);
+
+      //目標値に近づいてきたら、ファンの回転を止める
+      if (abs(Setpoint_h - Input_h) < 2) {
+        digitalWrite(fan_output, LOW);
+      }
     }
 
     else if (mode == 2) {

@@ -1,5 +1,5 @@
 //PWM制御(スイッチング用)のピン
-const int fan_output = 11;
+const int fan_output = 10;
 
 //Pythonからの入力(目標値)読み込み
 int inputchar;
