@@ -8,23 +8,28 @@ double Setpoint_h, Input_h, Output_h; //PID制御の目標値、入力、出力
 double Setpoint_c, Input_c, Output_c; //PID制御の目標値、入力、出力
 double Input;
 
+// 温めるか冷やすかによって、PIDパラメータも別に設定しておく
 //Define the aggressive and conservative Tuning Parameters
-double aggKp=150, aggKi=10, aggKd=1;
-double consKp=50, consKi=0.1, consKd=0.8;
+// 温める時 (kp_h=40, kp_c= 60もあり)
+double aggKp_h=30, aggKi_h=0.5, aggKd_h=1;
+double consKp_h=8, consKi_h=0.8, consKd_h=0.25; 
+// 冷やす時
+double aggKp_c=50, aggKi_c=0.5, aggKd_c=1;
+double consKp_c=10, consKi_c=0.8, consKd_c=0.25;
 
 //Specify the links and initial tuning parameters
-PID myPID_h(&Input_h, &Output_h, &Setpoint_h, consKp, consKi, consKd, DIRECT);
-PID myPID_c(&Input_c, &Output_c, &Setpoint_c, consKp, consKi, consKd, DIRECT);
+PID myPID_h(&Input_h, &Output_h, &Setpoint_h, consKp_h, consKi_h, consKd_h, DIRECT);
+PID myPID_c(&Input_c, &Output_c, &Setpoint_c, consKp_c, consKi_c, consKd_c, DIRECT);
 
 
-//IC温度センサ、ペルチェ制御関連の変数とか
+//IC温度センサ、ペルチェ制御関連の変数とかM
 const int sensorPin_1 = A0;
 const int sensorPin_2 = A1; 
 double Vout_1;  //出力電圧(Vout1)
 double Vout_2;  //出力電圧(Vout2)
 double R_1;  //サーミスタ抵抗値(R1)
 double R_2;  //サーミスタ抵抗値(R2)
-double B_1;  //補正係数(B1)
+double B_1;  //補正係数(B1)c
 double B_2;  //補正係数(B2)
 
 float T_1;
@@ -228,14 +233,15 @@ void loop() {
       double gap = abs(Setpoint_h - Input_h); //distance away from setpoint
       digitalWrite(Peltier_in1, LOW);
       digitalWrite(Peltier_in2, HIGH);
-      if (gap < 0.3) {
+        
+      if (gap < 1.5) {
         //we're close to setpoint, use conservative tuning parameters
-        myPID_h.SetTunings(consKp, consKi, consKd);
+        myPID_h.SetTunings(consKp_h, consKi_h, consKd_h);
       }
       else
       {
          //we're far from setpoint, use aggressive tuning parameters
-         myPID_h.SetTunings(aggKp, aggKi, aggKd);
+         myPID_h.SetTunings(aggKp_h, aggKi_h, aggKd_h);
       }
     
       myPID_h.Compute();
@@ -256,16 +262,17 @@ void loop() {
     else if (mode == 2) {
       Input_c = -1 * (double)(T_2 - T_1);
       double gap = abs(Setpoint_c - Input_c); //distance away from setpoint
-      digitalWrite(Peltier_in1, HIGH); //負
+      digitalWrite(Peltier_in1, HIGH);
       digitalWrite(Peltier_in2, LOW);
-      if (gap < 0.3) {
+    
+      if (gap < 1) {
         //we're close to setpoint, use conservative tuning parameters
-        myPID_c.SetTunings(consKp, consKi, consKd);
+        myPID_c.SetTunings(consKp_c, consKi_c, consKd_c);
       }
       else
       {
          //we're far from setpoint, use aggressive tuning parameters
-         myPID_c.SetTunings(aggKp, aggKi, aggKd);
+         myPID_c.SetTunings(aggKp_c, aggKi_c, aggKd_c);
       }
     
       myPID_c.Compute();
