@@ -57,8 +57,8 @@ void setup() {
   pinMode(sensorPin_1, INPUT);
   pinMode(sensorPin_2, INPUT);
   Serial.begin(9600);
-  Vout_1 = analogRead(sensorPin1) * 5.0 / 1024.0; //出力電圧(Vout1)を測定
-  Vout_2 = analogRead(sensorPin2) * 5.0 / 1024.0; //出力電圧(Vout2)を測定
+  Vout_1 = analogRead(sensorPin_1) * 5.0 / 1024.0; //出力電圧(Vout1)を測定
+  Vout_2 = analogRead(sensorPin_2) * 5.0 / 1024.0; //出力電圧(Vout2)を測定
   R_1 = (5.0 * 4.7) / Vout_1 - 4.7; //サーミスタ抵抗値(R1)を計算
   R_2 = (5.0 * 4.7) / Vout_2 - 4.7; //サーミスタ抵抗値(R2)を計算
   B_1 = 3452.9 * pow(R_1,-0.012329); //補正係数(B1)を計算
@@ -93,8 +93,8 @@ void setup() {
 
 
 void loop() {
-  Vout_1 = analogRead(sensorPin1) * 5.0 / 1024.0; //出力電圧(Vout1)を測定
-  Vout_2 = analogRead(sensorPin2) * 5.0 / 1024.0; //出力電圧(Vout2)を測定
+  Vout_1 = analogRead(sensorPin_1) * 5.0 / 1024.0; //出力電圧(Vout1)を測定
+  Vout_2 = analogRead(sensorPin_2) * 5.0 / 1024.0; //出力電圧(Vout2)を測定
   R_1 = (5.0 * 4.7) / Vout_1 - 4.7; //サーミスタ抵抗値(R1)を計算
   R_2 = (5.0 * 4.7) / Vout_2 - 4.7; //サーミスタ抵抗値(R2)を計算
   B_1 = 3452.9 * pow(R_1,-0.012329); //補正係数(B1)を計算
