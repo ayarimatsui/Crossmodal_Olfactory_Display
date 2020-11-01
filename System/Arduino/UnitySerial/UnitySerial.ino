@@ -1,8 +1,8 @@
 //Arduinoの制御
 
-
 //PID制御のライブラリ]
 #include <PID_v1.h>
+#include <math.h>
 
 //変数設定
 //PID制御関連の変数、初期設定
@@ -85,26 +85,26 @@ void setup()
 void sendOK()
 {
   //シリアル送信
-  Serial.println("1");
+  Serial.print(1);
+  Serial.print(",");
+  Serial.println("");
 }
 
 void sendNG()
 {
   //シリアル送信
-  Serial.println("0");
+  Serial.print(0);
+  Serial.print(",");
+  Serial.println("");
 }
 
-void loop()
+void Receive()
 {
-  T_1 = calcTemperature(sensorPin_1); //サーミスタ温度(T1)を計算
-  T_2 = calcTemperature(sensorPin_2); //サーミスタ温度(T2)を計算
-
-  //Unityからの入力があった時
-  if ( Serial.available() ) {
-    char mode = Serial.read();
+  if (Serial.available()){
+    char inputchar = Serial.read();
 
     //Unityから送られてきた文字によって動作を変える
-    switch (mode) {
+    switch (inputchar) {
       //ペルチェ素子のPID制御
       //ペルチェ素子にかかる電圧を0にする
       case 'o':
@@ -134,9 +134,8 @@ void loop()
           myPID_c.SetMode(AUTOMATIC);
           //ファンをon
           digitalWrite(fan_output, HIGH);
-          //NGサインをUnityに送信
-          sendNG();
           OK = false;
+          sendNG();
           break;
         }
         else {
@@ -152,9 +151,8 @@ void loop()
           mode = 1;
           //turn the PID on
           myPID_h.SetMode(AUTOMATIC);
-          //NGサインをUnityに送信
-          sendNG();
           OK = false;
+          sendNG();
           break;
         }
       //室温+2度の時
@@ -171,9 +169,8 @@ void loop()
         mode = 1;
         //turn the PID on
         myPID_h.SetMode(AUTOMATIC);
-        //NGサインをUnityに送信
-        sendNG();
         OK = false;
+        sendNG();
         break;
       //室温-2度の時
       case 'c':
@@ -191,68 +188,79 @@ void loop()
         myPID_c.SetMode(AUTOMATIC);
         //ファンをon
         digitalWrite(fan_output, HIGH);
-        //NGサインをUnityに送信
-        sendNG();
         OK = false;
+        sendNG();
         break;
-    }
+    } 
   }
-  else{
-    if (mode == 1) {
-      Input_h = (double)(T_2 - T_1);
-      double gap = abs(Setpoint_h - Input_h); //distance away from setpoint
-      digitalWrite(Peltier_in1, LOW);
-      digitalWrite(Peltier_in2, HIGH);
+}
+
+void sendData()
+{
+  T_1 = calcTemperature(sensorPin_1); //サーミスタ温度(T1)を計算
+  T_2 = calcTemperature(sensorPin_2); //サーミスタ温度(T2)を計算
+  
+  if (mode == 1) {
+    Input_h = (double)(T_2 - T_1);
+    double gap = abs(Setpoint_h - Input_h); //distance away from setpoint
+    digitalWrite(Peltier_in1, LOW);
+    digitalWrite(Peltier_in2, HIGH);
         
-      if (gap < 1.5) {
-        //we're close to setpoint, use conservative tuning parameters
-        myPID_h.SetTunings(consKp_h, consKi_h, consKd_h);
-      }
-      else
-      {
-         //we're far from setpoint, use aggressive tuning parameters
-         myPID_h.SetTunings(aggKp_h, aggKi_h, aggKd_h);
-      }
+    if (gap < 1.5) {
+      //we're close to setpoint, use conservative tuning parameters
+      myPID_h.SetTunings(consKp_h, consKi_h, consKd_h);
+    }
+    else
+    {
+      //we're far from setpoint, use aggressive tuning parameters
+      myPID_h.SetTunings(aggKp_h, aggKi_h, aggKd_h);
+    }
     
-      myPID_h.Compute();
-      analogWrite(PWM_output, Output_h);
+    myPID_h.Compute();
+    analogWrite(PWM_output, Output_h);
 
-      //目標値に近づいてきたら、ファンの回転を止める
-      if (abs(Setpoint_h - Input_h) < 2) {
-        digitalWrite(fan_output, LOW);
-      }
-
-      //目標値に到達したら、UnityにOKサインを送信する
-      if (OK == false && abs(Setpoint_h - Input_h) < 0.15) {
-        sendOK();
-        OK = true;
-      }
+    //目標値に近づいてきたら、ファンの回転を止める
+    if (abs(Setpoint_h - Input_h) < 2) {
+      digitalWrite(fan_output, LOW);
     }
 
-    else if (mode == 2) {
-      Input_c = -1 * (double)(T_2 - T_1);
-      double gap = abs(Setpoint_c - Input_c); //distance away from setpoint
-      digitalWrite(Peltier_in1, HIGH);
-      digitalWrite(Peltier_in2, LOW);
-    
-      if (gap < 1) {
-        //we're close to setpoint, use conservative tuning parameters
-        myPID_c.SetTunings(consKp_c, consKi_c, consKd_c);
-      }
-      else
-      {
-         //we're far from setpoint, use aggressive tuning parameters
-         myPID_c.SetTunings(aggKp_c, aggKi_c, aggKd_c);
-      }
-    
-      myPID_c.Compute();
-      analogWrite(PWM_output, Output_c);
-
-      //目標値に到達したら、UnityにOKサインを送信する
-      if (OK == false && abs(Setpoint_c - Input_c) < 0.15) {
-        sendOK();
-        OK = true;
-      }
+    //目標値に到達したら、UnityにOKサインを送信する
+    if (OK == false && abs(Setpoint_h - Input_h) < 0.15) {
+      sendOK();
+      OK = true;
     }
   }
+
+  else if (mode == 2) {
+    Input_c = -1 * (double)(T_2 - T_1);
+    double gap = abs(Setpoint_c - Input_c); //distance away from setpoint
+    digitalWrite(Peltier_in1, HIGH);
+    digitalWrite(Peltier_in2, LOW);
+    digitalWrite(fan_output, LOW); //テスト
+    
+    if (gap < 1) {
+      //we're close to setpoint, use conservative tuning parameters
+      myPID_c.SetTunings(consKp_c, consKi_c, consKd_c);
+    }
+    else
+    {
+       //we're far from setpoint, use aggressive tuning parameters
+       myPID_c.SetTunings(aggKp_c, aggKi_c, aggKd_c);
+    }
+    
+    myPID_c.Compute();
+    analogWrite(PWM_output, Output_c);
+
+    //目標値に到達したら、UnityにOKサインを送信する
+    if (OK == false && abs(Setpoint_c - Input_c) < 0.15) {
+      sendOK();
+      OK = true;
+    }
+  }
+}
+
+void loop()
+{
+  Receive();
+  sendData();
 }
