@@ -13,11 +13,11 @@ double Input;
 // 温めるか冷やすかによって、PIDパラメータも別に設定しておく
 //Define the aggressive and conservative Tuning Parameters
 // 温める時 (kp_h=40, kp_c= 60もあり)
-double aggKp_h=30, aggKi_h=0.5, aggKd_h=1;
+double aggKp_h=50, aggKi_h=0.5, aggKd_h=1;
 double consKp_h=8, consKi_h=0.8, consKd_h=0.25; 
 // 冷やす時
-double aggKp_c=50, aggKi_c=0.5, aggKd_c=1;
-double consKp_c=10, consKi_c=0.8, consKd_c=0.25;
+double aggKp_c=80, aggKi_c=0.5, aggKd_c=1;
+double consKp_c=40, consKi_c=0.8, consKd_c=0.25;
 
 //Specify the links and initial tuning parameters
 PID myPID_h(&Input_h, &Output_h, &Setpoint_h, consKp_h, consKi_h, consKd_h, DIRECT);
