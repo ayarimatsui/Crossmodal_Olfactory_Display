@@ -225,7 +225,7 @@ void sendData()
     }
 
     //目標値に到達したら、UnityにOKサインを送信する
-    if (OK == false && abs(Setpoint_h - Input_h) < 0.15) {
+    if (OK == false && gap < 0.15) {
       sendOK();
       OK = true;
     }
@@ -252,7 +252,7 @@ void sendData()
     analogWrite(PWM_output, Output_c);
 
     //目標値に到達したら、UnityにOKサインを送信する
-    if (OK == false && abs(Setpoint_c - Input_c) < 0.15) {
+    if (OK == false && gap < 0.15) {
       sendOK();
       OK = true;
     }
