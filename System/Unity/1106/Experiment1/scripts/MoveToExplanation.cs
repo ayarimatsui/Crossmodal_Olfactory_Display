@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class FinishIntermission : MonoBehaviour
+public class MoveToExplanation : MonoBehaviour
 {
-
     // Start is called before the first frame update
     void Start()
     {
@@ -17,7 +16,7 @@ public class FinishIntermission : MonoBehaviour
     {
         if (OVRInput.GetDown(OVRInput.RawButton.A))
         {
-            SceneManager.LoadScene("Waiting_Scene0");
+            SceneManager.LoadScene("Explanation_Scene");
         }
     }
 }

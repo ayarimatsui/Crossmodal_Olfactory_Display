@@ -45,18 +45,35 @@ public class ChangeToWaitingScene : MonoBehaviour
         StreamWriter sw;
         sw = new StreamWriter(Application.dataPath + "/Data/" + fileName + ".csv", true);
 
-        int TestID = ExperimentID.getTestID();
-        int TrialID = TestID;
-        if (TestID <= 2)
+        // 読み込みたいCSVファイルのパスを指定して開く
+        StreamReader sr = new StreamReader(Application.dataPath + "/Data/" + "Experiment1_order.csv");
+        // CSVファイルの一行を読み込む
+        string orderLine = sr.ReadLine();
+        // 読み込んだ一行をカンマ毎に分けて配列に格納する
+        string[] orderString = orderLine.Split(',');
+        // 各試行の香料のIDと条件(A, B, C)をリストに格納
+        List<string> AromaCondition = new List<string>();
+        AromaCondition.AddRange(orderString);
+        // 試行が練習なのか本番なのか、試行番号を読み込み
+        string trialStateLine = sr.ReadLine();
+        string[] trialState = trialStateLine.Split(',');
+        string Test_or_Trial = trialState[0];
+        int TrialID = int.Parse(trialState[1]);
+        int AromaID;
+        string Condition;
+
+        if (Test_or_Trial == "Test")
         {
-            TrialID = TestID;
+            AromaID = TrialID;
+            Condition = "T";
         }
         else
         {
-            TrialID = ExperimentID.getTrialID();
+            string line = AromaCondition[TrialID - 1];
+            AromaID = int.Parse(line.Substring(0, line.Length - 1));
+            Condition = line.Substring(line.Length - 1);
         }
-        int AromaID = ExperimentID.getAromaID();
-        string Condition = ExperimentID.getCondition();
+
         string[] s1 = {TrialID.ToString(), AromaID.ToString(), Condition, x.ToString()};
         string s2 = string.Join(",", s1);
         sw.WriteLine(s2);

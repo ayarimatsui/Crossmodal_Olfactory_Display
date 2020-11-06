@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class FinishIntermission : MonoBehaviour
+public class MoveToExplanationTest : MonoBehaviour
 {
+    float totalTime;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        totalTime = 3;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (OVRInput.GetDown(OVRInput.RawButton.A))
+        totalTime -= Time.deltaTime;
+
+        if (totalTime <= 0)
         {
-            SceneManager.LoadScene("Waiting_Scene0");
+            SceneManager.LoadScene("Explanation_Scene");
         }
     }
 }

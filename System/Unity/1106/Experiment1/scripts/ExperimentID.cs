@@ -8,12 +8,12 @@ using UnityEngine.UI;
 
 public class ExperimentID : MonoBehaviour
 {
-    //oublic static使わずに、外部のcsvファイルに書き込み＆読み込みでグローバル変数を共有に書き直す
-    public static int TrialID = 0;
-    public static int TestID = 1; 
-    public static int AromaID = 0;
-    public static string Condition = "T";
-    public static List<string> AromaCondition = new List<string>();
+    //外部のcsvファイルに書き込み＆読み込みでグローバル変数を共有に書き直す
+    public int TrialID = 0;
+    public int TestID = 1; 
+    public int AromaID = 0;
+    public string Condition = "T";
+    public List<string> AromaCondition = new List<string>();
 
     // Start is called before the first frame update
     void Start()
@@ -50,7 +50,7 @@ public class ExperimentID : MonoBehaviour
         sw2.Close();
     }
 
-   
+    /*
     public static int getTrialID()
     {
         return TrialID;
@@ -107,7 +107,7 @@ public class ExperimentID : MonoBehaviour
             Condition = "T";
         }
         return Condition;
-    }
+    }*/
 
 
     // Update is called once per frame
