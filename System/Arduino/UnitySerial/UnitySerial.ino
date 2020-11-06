@@ -14,7 +14,7 @@ double Input;
 //Define the aggressive and conservative Tuning Parameters
 // 温める時 (kp_h=40, kp_c= 60もあり)
 double aggKp_h=50, aggKi_h=0.5, aggKd_h=1;
-double consKp_h=8, consKi_h=0.8, consKd_h=0.25; 
+double consKp_h=20, consKi_h=0.8, consKd_h=0.25; 
 // 冷やす時
 double aggKp_c=80, aggKi_c=0.5, aggKd_c=1;
 double consKp_c=40, consKi_c=0.8, consKd_c=0.25;
@@ -37,6 +37,8 @@ int PWM_output = 11;  //PWM制御 (アナログ入力)
 
 //モードを表す変数
 int mode;
+char command;
+int count_to_off = 0;
 
 //シーン切り替えしてOKかどうか
 bool OK = false;
@@ -68,6 +70,13 @@ void setup()
   T_1 = calcTemperature(sensorPin_1); //サーミスタ温度(T1)を計算
   T_2 = calcTemperature(sensorPin_2); //サーミスタ温度(T2)を計算
 
+  // テスト
+  /*
+  Serial.print("Initialized  Temperature_1(ºC): ");
+  Serial.print(T_1);
+  Serial.print("  Temperature_2(ºC): ");
+  Serial.println(T_2);
+  */
 
   //ペルチェ素子への出力の初期化
   pinMode(Peltier_in1, OUTPUT);
@@ -114,10 +123,12 @@ void Receive()
         //ファンをOFF
         digitalWrite(fan_output, LOW);
         mode = 0;
+        command = 'o';
         break;
         
       //室温と同じ時
       case 'r':
+      command = 'r';
         Input = (double)(T_2 - T_1);
         if (Input >= 0) {
           Input_c = -1 * (double)(T_2 - T_1);
@@ -134,6 +145,7 @@ void Receive()
           myPID_c.SetMode(AUTOMATIC);
           //ファンをon
           digitalWrite(fan_output, HIGH);
+          //Serial.println("room temperature"); //テスト
           OK = false;
           sendNG();
           break;
@@ -151,6 +163,7 @@ void Receive()
           mode = 1;
           //turn the PID on
           myPID_h.SetMode(AUTOMATIC);
+          //Serial.println("room temperature"); //テスト
           OK = false;
           sendNG();
           break;
@@ -167,8 +180,10 @@ void Receive()
         digitalWrite(Peltier_in1, LOW);
         digitalWrite(Peltier_in2, HIGH);
         mode = 1;
+        command = 'h';
         //turn the PID on
         myPID_h.SetMode(AUTOMATIC);
+        //Serial.println("+2℃ from room temperature");  //テスト
         OK = false;
         sendNG();
         break;
@@ -184,10 +199,12 @@ void Receive()
         digitalWrite(Peltier_in1, HIGH); //負
         digitalWrite(Peltier_in2, LOW);
         mode = 2;
+        command = 'c';
         //turn the PID on
         myPID_c.SetMode(AUTOMATIC);
         //ファンをon
         digitalWrite(fan_output, HIGH);
+        //Serial.println("-2℃ from room temperature"); //テスト
         OK = false;
         sendNG();
         break;
@@ -215,6 +232,10 @@ void sendData()
       //we're far from setpoint, use aggressive tuning parameters
       myPID_h.SetTunings(aggKp_h, aggKi_h, aggKd_h);
     }
+
+    if (command == 'r' && gap < 0.3) {
+      mode = 0;
+    }
     
     myPID_h.Compute();
     analogWrite(PWM_output, Output_h);
@@ -224,10 +245,38 @@ void sendData()
       digitalWrite(fan_output, LOW);
     }
 
+    //テスト
+    /*
+    Serial.print("Temperature_1(ºC): ");
+    Serial.print(T_1);
+    Serial.print("  Temperature_2(ºC): ");
+    Serial.print(T_2);
+    Serial.print("  Mode : ");
+    Serial.print(mode);
+    Serial.print("  Current Gap : ");
+    Serial.print(Setpoint_h - Input_h);
+    Serial.print("  Output(V) : ");
+    Serial.println(6 * Output_h / 255);
+    */
+
     //目標値に到達したら、UnityにOKサインを送信する
-    if (OK == false && gap < 0.15) {
+    if (OK == false && (Setpoint_h - Input_h) < 0.15) {
       sendOK();
       OK = true;
+    }
+
+    //Unityからの指示が「室温(r)」の場合は、目標値に近くなったら電圧を0にする
+    if (command == 'r' && gap < 1.4) {
+      count_to_off += 1;
+      if (count_to_off >= 3) {
+        digitalWrite(Peltier_in1, LOW);
+        digitalWrite(Peltier_in2, LOW);
+        analogWrite(PWM_output, 0);
+        //ファンをOFF
+        digitalWrite(fan_output, LOW);
+        mode = 0;
+        count_to_off = 0;
+      }
     }
   }
 
@@ -236,7 +285,6 @@ void sendData()
     double gap = abs(Setpoint_c - Input_c); //distance away from setpoint
     digitalWrite(Peltier_in1, HIGH);
     digitalWrite(Peltier_in2, LOW);
-    digitalWrite(fan_output, LOW); //テスト
     
     if (gap < 1) {
       //we're close to setpoint, use conservative tuning parameters
@@ -251,6 +299,58 @@ void sendData()
     myPID_c.Compute();
     analogWrite(PWM_output, Output_c);
 
+    //テスト
+    /*
+    Serial.print("Temperature_1(ºC): ");
+    Serial.print(T_1);
+    Serial.print("  Temperature_2(ºC): ");
+    Serial.print(T_2);
+    Serial.print("  Mode : ");
+    Serial.print(mode);
+    Serial.print("  Current Gap : ");
+    Serial.print(Setpoint_c - Input_c);
+    Serial.print("  Output(V) : ");
+    Serial.println(6 * Output_c / 255);
+    */
+
+    //目標値に到達したら、UnityにOKサインを送信する
+    if (OK == false && (Setpoint_c - Input_c) < 0.15) {
+      sendOK();
+      OK = true;
+    }
+
+    //Unityからの指示が「室温(r)」の場合は、目標値に近くなったら電圧を0にする
+    if (command == 'r' && gap < 1.2) {
+      count_to_off += 1;
+      if (count_to_off >= 3) {
+        digitalWrite(Peltier_in1, LOW);
+        digitalWrite(Peltier_in2, LOW);
+        analogWrite(PWM_output, 0);
+        //ファンをOFF
+        digitalWrite(fan_output, LOW);
+        mode = 0;
+        count_to_off = 0;
+      }
+    }
+  }
+
+  else if (mode == 0 && command == 'r'){
+    double gap = abs(T_2 - T_1);
+
+    //テスト
+    /*
+    Serial.print("Temperature_1(ºC): ");
+    Serial.print(T_1);
+    Serial.print("  Temperature_2(ºC): ");
+    Serial.print(T_2);
+    Serial.print("  Mode : ");
+    Serial.print(mode);
+    Serial.print("  Current Gap : ");
+    Serial.print(gap);
+    Serial.print("  Output(V) : ");
+    Serial.println(0);
+    */
+    
     //目標値に到達したら、UnityにOKサインを送信する
     if (OK == false && gap < 0.15) {
       sendOK();
