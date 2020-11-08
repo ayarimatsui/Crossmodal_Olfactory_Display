@@ -74,7 +74,7 @@ public class MoveToNextScene : MonoBehaviour
         else
         {
             // 試行番号(TrialID)の更新
-            if ((Test_or_Trial == "Trial" && TrialID != 37) || (Test_or_Trial == "Test" && TrialID < 2))
+            if (Test_or_Trial == "Trial" || (Test_or_Trial == "Test" && TrialID < 2))
             {
                 TrialID += 1;
             }

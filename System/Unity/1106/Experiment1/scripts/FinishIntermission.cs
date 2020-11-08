@@ -17,7 +17,7 @@ public class FinishIntermission : MonoBehaviour
     {
         if (OVRInput.GetDown(OVRInput.RawButton.A))
         {
-            SceneManager.LoadScene("Waiting_Scene0");
+            SceneManager.LoadScene("Waiting_Scene_from_Intermission");
         }
     }
 }
