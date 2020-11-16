@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
+using System.IO;
 
 public class TextControll2 : MonoBehaviour
 {
+    public SerialHandler serialHandler;
     public Text ExplainText; //説明文
     public Text CountText; //カウントダウンテキスト
     public Text EndText; //終わりのテキスト
@@ -13,10 +16,14 @@ public class TextControll2 : MonoBehaviour
     float totalTime;
     int sec;
     int mode;
+    bool mode_changed = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        //信号を受信したときに、そのメッセージの処理を行う
+        //serialHandler.OnDataReceived += OnDataReceived;
+
         // 説明文のみを表示
         ExplainText.enabled = true;
         CountText.enabled = false;
@@ -35,10 +42,18 @@ public class TextControll2 : MonoBehaviour
             CountText.enabled = true;
             EndText.enabled = false;
             mode = 1; //カウント表示モード
+            mode_changed = true;
         }
 
         else if (mode == 1)
         {
+            if (mode_changed == true)
+            {
+                // 匂い噴出を開始
+                serialHandler.Write("1");
+                mode_changed = false;
+            }
+
             // カウントダウンを表示
             totalTime -= Time.deltaTime;
             sec = (int)totalTime;
@@ -51,16 +66,25 @@ public class TextControll2 : MonoBehaviour
                 CountText.enabled = false;
                 EndText.enabled = true;
                 mode = 2; //終わりのテキスト表示モード
+                mode_changed = true;
                 totalTime = 5;
             }
         }
 
         else if (mode == 2)
         {
+            if (mode_changed == true)
+            {
+                // 空気を噴出して、前の匂いを飛ばす
+                serialHandler.Write("2");
+                mode_changed = false;
+            }
+
             totalTime -= Time.deltaTime;
             // 5秒経ったら、待機シーンに遷移
             if (totalTime <= 0)
             {
+                serialHandler.Write("0"); // すべてのエアポンプをOFFにする
                 SceneManager.LoadScene("Rating_Scene");
             }
         }
