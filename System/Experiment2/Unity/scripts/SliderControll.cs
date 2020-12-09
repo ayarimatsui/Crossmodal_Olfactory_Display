@@ -166,7 +166,17 @@ public class SliderControll : MonoBehaviour
             Condition = line.Substring(line.Length - 1);
         }
 
-        string[] s1 = { TrialID.ToString(), AromaID.ToString(), Condition, x[0].ToString(), x[1].ToString(), x[2].ToString(), x[3].ToString(), x[4].ToString(), x[5].ToString(), x[6].ToString()};
+        // 読み込みたいCSVファイルのパスを指定して開く
+        StreamReader sr2 = new StreamReader(Application.dataPath + "/Data/" + "aroma_order.csv");
+        // CSVファイルの一行を読み込む
+        string AromaOrderLine = sr2.ReadLine();
+        // 読み込んだ一行をカンマ毎に分けて配列に格納する
+        string[] AromaOrderString = AromaOrderLine.Split(',');
+        // 各試行の香料のIDと条件(R, H, C)をリストに格納
+        List<string> Aromas = new List<string>();
+        Aromas.AddRange(AromaOrderString);
+
+        string[] s1 = { TrialID.ToString(), Aromas[AromaID - 1], Condition, x[0].ToString(), x[1].ToString(), x[2].ToString(), x[3].ToString(), x[4].ToString(), x[5].ToString(), x[6].ToString()};
         string s2 = string.Join(",", s1);
         sw.WriteLine(s2);
         sw.Flush();

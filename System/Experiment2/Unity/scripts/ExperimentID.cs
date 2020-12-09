@@ -53,7 +53,7 @@ public class ExperimentID : MonoBehaviour
         //評価データ保存用csvファイルの作成
         StreamWriter sw2;
         sw2 = new StreamWriter(Application.dataPath + "/Data/" + "Experiment2_evaluation.csv", true);
-        string[] s1 = { "TrialID", "AromaID", "Condition", "pleasant-unpleasant", "sweet", "sour", "bitter", "light", "fresh", "sticky" };
+        string[] s1 = { "TrialID", "Aroma", "Condition", "pleasant-unpleasant", "sweet", "sour", "bitter", "light", "fresh", "sticky" };
         string s2 = string.Join(",", s1);
         sw2.WriteLine(s2);
         sw2.Flush();
