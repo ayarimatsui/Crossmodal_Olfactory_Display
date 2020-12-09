@@ -12,5 +12,4 @@ for n in range(N // 3):
     for i in range(3):
         with open('csvFiles/order_subject' + str(n * 3 + i + 1) + '.csv', 'w') as f:
             writer = csv.writer(f)
-            writer.writerow([1, aroma_list[i * 2]])
-            writer.writerow([2, aroma_list[i * 2 + 1]])
+            writer.writerow([aroma_list[i * 2], aroma_list[i * 2 + 1]])
