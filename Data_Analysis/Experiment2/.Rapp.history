@@ -1,0 +1,140 @@
+install.packages("tidyverse")
+library(tidyverse)
+ggplot(data=mpg)
+ggplot(data=mpg)+geom_point(mapping=aes(x=displ,y=cty))
+ggplot(data=mpg)+geom_point(mapping=aes(x=displ,y=cty))#
+　+theme_classic(base_size=20)
+ggplot(data=mpg)+geom_point(mapping=aes(x=displ,y=cty))+theme_classic(base_size=20)
+library(ggsignif)
+library(ggplot2)
+install.packages("ggsignif")
+library(ggsignif)
+raw_data <- read.table(file='sample.txt', sep='\t', header = T, fileEncoding="UTF-8")#
+#
+num <- transform(raw_data, Species= factor(Species, levels = c('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'R', 'J')))#
+#
+library(ggplot2)#
+plt <- ggplot(num, aes(y=CysteineResidues,x=Species)) +#
+  geom_boxplot(width=0.4) + #
+  ylab("NUMBER") + expand_limits(y = 0) #
+plt
+ls
+cd ~
+cd ~/Document
+source("R_test.R")
+getwd()
+setwd(Document)
+setwd("/Users/matsuiayari/Documents/")
+getwd()
+source("R_test.R")
+setwd("/Users/matsuiayari/Desktop/Cyber_Interface_Lab/卒論/Crossmodal_Olfactory_Display/Data_Analysis/Experiment2/")
+data=read.csv(“ex2_apple.csv”, header=TRUE)
+data
+data = read.table(“ex2_apple.csv”, sep=”,”, header=TRUE)
+data
+data = read.table(“ex2_apple.csv”, sep=”,”, header=False)
+data
+data_apple = read.table(“ex2_apple.csv”, sep=”,”, header=TRUE)
+data_apple
+getwd()
+data_apple = read.table(“ex2_apple.csv”, sep=”,”, header=FALSE)
+data_apple
+data_apple=read.csv(“ex2_apple.csv”, header=TRUE)
+data_apple
+data_apple<-read.csv(“ex2_apple.csv”, header=TRUE)
+data_apple
+data_apple<-read.csv(“ex2_apple.csv”)
+data_apple
+head(data_apple)
+data_apple <- read.csv("ex2_apple.csv")
+data_apple
+data_apple <- read.csv("ex2_apple.csv", header=TRUE)
+data_apple
+data_apple[0][0]
+data_apple <- read.csv("ex2_apple.csv", header=TRUE)
+names(data_apple)
+data_apple <- read.csv("ex2_apple.csv", header=TRUE, row.names = 1)
+barplot(data_apple$甘い,names=rownames(data_apple))
+base_family = "HirakakuPro-W3"
+barplot(data_apple$甘い,names=rownames(data_apple))
+barplot(data_apple$甘い,names=rownames(data_apple))
+data_apple <- read.csv("ex2_apple.csv", header=TRUE)
+data_apple
+source("ex2_apple.R")
+install.packages("ggsci")#
+library(ggsci)
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+par(family= "HiraKakuProN-W3")
+install.packages("systemfonts")
+par(family= "HiraKakuProN-W3")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
+source("ex2_apple.R")
