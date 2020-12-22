@@ -1,0 +1,15 @@
+library(ggplot2)
+library(ggsci)
+
+par(family= "HiraKakuProN-W3")
+
+data_rating <- read.csv("ex2_apple.csv", header=TRUE)
+data_rating$鼻部皮膚温度 <- factor(data_rating$温度, levels = c('基準温度', '基準温度+2℃', '基準温度-2℃'))
+g <- ggplot(data_rating, aes(x = 評価軸, y = 評価値, fill = 鼻部皮膚温度))
+g <- g + geom_bar(stat = "identity", position = "dodge")
+g <- g + scale_x_discrete(limit=c('甘い', '酸っぱい', '苦い', 'アッサリした', '爽快な', 'まとわりつく感じ'))
+g <- g + scale_fill_nejm()
+g <- g + theme_bw(base_family="HiraKakuProN-W3")
+g <- g + ylim(0, 6)
+g <- g + scale_fill_manual(values = c("#6B8E23", "#FFA07A", "#87CEEB"))
+plot(g)
