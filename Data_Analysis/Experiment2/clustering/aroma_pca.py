@@ -16,7 +16,7 @@ df = pd.read_csv("aroma_features2.csv",index_col=0)
 #dfs = df.iloc[:, 1:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
  
 linkage_result = linkage(df, method='ward', metric='euclidean')  # ward法，ユークリッド距離を使用
-dendrogram_fig = dendrogram(linkage_result, labels=df.index, leaf_font_size=6, color_threshold=2)
+dendrogram_fig = dendrogram(linkage_result, labels=df.index, leaf_font_size=6, color_threshold=3)
 
 plt.show()
 
